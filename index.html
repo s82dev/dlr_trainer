@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✈️ DLR Pilot Training - Testplattform</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #151c2c;
+            --card-border: #222f47;
+            --accent-blue: #00e5ff;
+            --accent-green: #00ff88;
+            --accent-yellow: #ffb700;
+            --accent-red: #ff3366;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #080b12;
+            border-bottom: 1px solid var(--card-border);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .nav-btn.active, .nav-btn:hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            background: rgba(0, 229, 255, 0.05);
+        }
+
+        main {
+            flex: 1;
+            padding: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .grid-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 1.25rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .card-subtext {
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+            margin-top: 0.25rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-blue);
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 0.5rem;
+        }
+
+        .grid-modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .module-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .module-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-blue);
+        }
+
+        .module-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .module-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .stats-mini {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-mini span {
+            color: var(--text-muted);
+        }
+
+        .stats-mini strong {
+            color: var(--accent-blue);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.6rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            text-align: center;
+        }
+
+        .btn:hover {
+            opacity: 0.85;
+        }
+
+        .btn-training { background-color: var(--accent-green); color: #000; }
+        .btn-time { background-color: var(--accent-yellow); color: #000; }
+        .btn-sim { background-color: var(--accent-red); color: #fff; }
+
+        /* Practice Area Styles */
+        .workspace {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .workspace.active {
+            display: flex;
+        }
+
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+        }
+
+        .timer-display {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-mono: monospace;
+            color: var(--accent-yellow);
+            background: #000;
+            padding: 0.2rem 0.8rem;
+            border-radius: 6px;
+            border: 1px solid var(--accent-yellow);
+        }
+
+        .question-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .option-btn {
+            background: #1e293b;
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--accent-blue);
+            background: #283548;
+        }
+
+        .input-box {
+            display: flex;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .text-input {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 6px;
+            border: 1px solid var(--card-border);
+            background: #0b0f19;
+            color: #fff;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .feedback-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+        }
+
+        .feedback-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .feedback-correct { color: var(--accent-green); }
+        .feedback-incorrect { color: var(--accent-red); }
+
+        .skt-target {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 1rem auto;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 600px) {
+            header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+            .nav-btn { padding: 0.4rem 0.6rem; font-size: 0.8rem; }
+            .grid-modules { grid-template-columns: 1fr; }
+            .question-text { font-size: 1.1rem; }
+            .options-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">✈️ DLR PILOT TRAINING</div>
+        <nav>
+            <button class="nav-btn active" onclick="switchTab('dashboard')">Dashboard</button>
+            <button class="nav-btn" onclick="switchTab('modules')">Testmodule</button>
+            <button class="nav-btn" onclick="startFullSimulation()">🔴 Vollsimulation</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- DASHBOARD TAB -->
+        <div id="tab-dashboard">
+            <h2 class="section-title">GESAMTPERFORMANCE & TRAININGSSTATUS</h2>
+            <div class="grid-dashboard">
+                <div class="card">
+                    <div class="card-header">Gesamtgenauigkeit</div>
+                    <div class="card-value" id="dash-accuracy">0%</div>
+                    <div class="card-subtext" id="dash-total-q">0 Aufgaben bearbeitet</div>
+                </div>
+                <div class="card">
+                    <div class="card-header">Durchschn. Reaktionszeit</div>
+                    <div class="card-value" id="dash-speed">0.00s</div>
+                    <div class="card-subtext">Verarbeitungsgeschwindigkeit</div>
+                </div>
+                <div class="card">
+                    <div class="card-header">Trainings-Streak</div>
+                    <div class="card-value" id="dash-streak">0 Tage</div>
+                    <div class="card-subtext">Kontinuität ist Schlüssel zur BU</div>
+                </div>
+            </div>
+
+            <h2 class="section-title">LEISTUNG NACH DLR-TESTBEREICHEN</h2>
+            <div class="grid-modules" id="dashboard-breakdown">
+                <!-- Dynamisch erzeugt -->
+            </div>
+        </div>
+
+        <!-- MODULES TAB -->
+        <div id="tab-modules" style="display: none;">
+            <h2 class="section-title">DLR TESTMODULE (BERUFSGRUNDUNTERSUCHUNG)</h2>
+            <div class="grid-modules" id="modules-list">
+                <!-- Dynamisch aus JS gerendert -->
+            </div>
+        </div>
+
+        <!-- WORKSPACE / TRAININGSBEREICH -->
+        <div id="workspace" class="workspace">
+            <div class="test-header">
+                <div>
+                    <h3 id="test-module-name" style="color: var(--accent-blue);">Modul Name</h3>
+                    <div id="test-mode-label" style="font-size: 0.8rem; color: var(--text-muted);">Training Modus</div>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div style="text-align: right;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">SCHWIERIGKEIT</div>
+                        <div id="adaptive-level" style="font-weight: bold; color: var(--accent-green);">Level 1 (Normal)</div>
+                    </div>
+                    <div class="timer-display" id="timer">00:00</div>
+                    <button class="nav-btn" onclick="exitTest()" style="border-color: var(--accent-red); color: var(--accent-red);">Abbrechen</button>
+                </div>
+            </div>
+
+            <div class="question-box" id="q-box">
+                <!-- Dynamischer Frage-Inhalt -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- DLR SYSTEM-DATENBANKS & ZUSTAND ---
+        const MODULES = {
+            krn: { name: "KRN - Kopfrechnen", desc: "Schnelle mentale Arithmetik ohne Hilfsmittel unter Zeitdruck.", type: "input" },
+            rag: { name: "RAG - Rechenaufgaben & Logik", desc: "Physikalisch-mathematische Textaufgaben (s=v*t, Prozent, Dreisatz).", type: "choice" },
+            wrt: { name: "WRT - Würfelkipp-Test", desc: "Mentale Rotation von Würfeln anhand visueller/räumlicher Anweisungen.", type: "choice" },
+            owt: { name: "OWT - Optischer Wahrnehmungstest", desc: "Kurzzeit-Gedächtnis für Aviation-Codes (Höhe, Speed, Callsign).", type: "memory" },
+            skt: { name: "SKT - Signal-Reaktionstest", desc: "Visuelle Reize, Fehlererkennung und Aufmerksamkeitssteuerung.", type: "reaction" },
+            ens: { name: "ENS - Aviation English", desc: "Verständnis englischer Anweisungen, Vokabeln & Phrasologie.", type: "choice" },
+            tvt: { name: "TVT - Technisches Verständnis", desc: "Grundlegende Physik, Mechanik, Hebel, Druck und Systeme.", type: "choice" }
+        };
+
+        let userStats = JSON.parse(localStorage.getItem('dlr_stats')) || {
+            totalAnswered: 0,
+            totalCorrect: 0,
+            totalTimeSpent: 0,
+            streak: 1,
+            modules: {
+                krn: { correct: 0, total: 0, totalTime: 0, level: 1 },
+                rag: { correct: 0, total: 0, totalTime: 0, level: 1 },
+                wrt: { correct: 0, total: 0, totalTime: 0, level: 1 },
+                owt: { correct: 0, total: 0, totalTime: 0, level: 1 },
+                skt: { correct: 0, total: 0, totalTime: 0, level: 1 },
+                ens: { correct: 0, total: 0, totalTime: 0, level: 1 },
+                tvt: { correct: 0, total: 0, totalTime: 0, level: 1 }
+            }
+        };
+
+        let currentSession = {
+            active: false,
+            moduleId: null,
+            mode: 'training', // 'training', 'time', 'sim'
+            timerInterval: null,
+            timeLeft: 0,
+            currentQuestion: null,
+            startTime: 0,
+            memorySequence: [],
+            simQueue: [],
+            simIndex: 0
+        };
+
+        // --- DASHBOARD & NAVIGATION ---
+        function switchTab(tabId) {
+            document.getElementById('tab-dashboard').style.display = tabId === 'dashboard' ? 'block' : 'none';
+            document.getElementById('tab-modules').style.display = tabId === 'modules' ? 'block' : 'none';
+            document.getElementById('workspace').classList.remove('active');
+            
+            document.querySelectorAll('nav .nav-btn').forEach(btn => btn.classList.remove('active'));
+            if(tabId === 'dashboard') document.querySelectorAll('nav .nav-btn')[0].classList.add('active');
+            if(tabId === 'modules') document.querySelectorAll('nav .nav-btn')[1].classList.add('active');
+
+            renderDashboard();
+            renderModules();
+        }
+
+        function renderDashboard() {
+            const acc = userStats.totalAnswered > 0 ? Math.round((userStats.totalCorrect / userStats.totalAnswered) * 100) : 0;
+            const avgSpeed = userStats.totalAnswered > 0 ? (userStats.totalTimeSpent / userStats.totalAnswered).toFixed(2) : "0.00";
+
+            document.getElementById('dash-accuracy').innerText = `${acc}%`;
+            document.getElementById('dash-total-q').innerText = `${userStats.totalAnswered} Aufgaben bearbeitet`;
+            document.getElementById('dash-speed').innerText = `${avgSpeed}s`;
+            document.getElementById('dash-streak').innerText = `${userStats.streak} Tag(e)`;
+
+            const container = document.getElementById('dashboard-breakdown');
+            container.innerHTML = '';
+
+            for (let id in MODULES) {
+                const m = userStats.modules[id];
+                const mAcc = m.total > 0 ? Math.round((m.correct / m.total) * 100) : 0;
+                const mSpeed = m.total > 0 ? (m.totalTime / m.total).toFixed(2) : "0.00";
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header">${MODULES[id].name}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 0.5rem;">
+                        <div><span style="font-size: 0.8rem; color: var(--text-muted);">Genauigkeit:</span> <strong style="color: var(--accent-green);">${mAcc}%</strong></div>
+                        <div><span style="font-size: 0.8rem; color: var(--text-muted);">Geschw.:</span> <strong style="color: var(--accent-blue);">${mSpeed}s</strong></div>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Adaptives Level: ${m.level}</div>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        function renderModules() {
+            const container = document.getElementById('modules-list');
+            container.innerHTML = '';
+
+            for (let id in MODULES) {
+                const m = MODULES[id];
+                const stats = userStats.modules[id];
+                const acc = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+
+                const card = document.createElement('div');
+                card.className = 'module-card';
+                card.innerHTML = `
+                    <div>
+                        <div class="module-title">${m.name}</div>
+                        <div class="module-desc">${m.desc}</div>
+                    </div>
+                    <div>
+                        <div class="stats-mini">
+                            <span>Genauigkeit: <strong>${acc}%</strong></span>
+                            <span>Level: <strong>${stats.level}</strong></span>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-training" onclick="startTest('${id}', 'training')">Training</button>
+                            <button class="btn btn-time" onclick="startTest('${id}', 'time')">Zeit</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        // --- TEST ENGINE ---
+        function startTest(moduleId, mode) {
+            currentSession.active = true;
+            currentSession.moduleId = moduleId;
+            currentSession.mode = mode;
+            
+            document.getElementById('tab-dashboard').style.display = 'none';
+            document.getElementById('tab-modules').style.display = 'none';
+            document.getElementById('workspace').classList.add('active');
+
+            document.getElementById('test-module-name').innerText = MODULES[moduleId].name;
+            document.getElementById('test-mode-label').innerText = mode === 'training' ? '🟢 Trainingsmodus (Mit Feedback)' : mode === 'time' ? '🟡 Zeittraining (Hoher Druck)' : '🔴 DLR Testsimulation';
+            document.getElementById('adaptive-level').innerText = `Level ${userStats.modules[moduleId].level}`;
+
+            if (mode === 'time') {
+                currentSession.timeLeft = 60; // 60s Zeittraining
+                startTimer();
+            } else if (mode === 'sim') {
+                currentSession.timeLeft = 30; // 30s pro Abschnitt in Sim
+                startTimer();
+            } else {
+                document.getElementById('timer').innerText = "∞";
+            }
+
+            nextQuestion();
+        }
+
+        function startTimer() {
+            clearInterval(currentSession.timerInterval);
+            updateTimerDisplay();
+            currentSession.timerInterval = setInterval(() => {
+                currentSession.timeLeft--;
+                updateTimerDisplay();
+                if (currentSession.timeLeft <= 0) {
+                    clearInterval(currentSession.timerInterval);
+                    finishTestSession();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(currentSession.timeLeft / 60).toString().padStart(2, '0');
+            const s = (currentSession.timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer').innerText = `${m}:${s}`;
+        }
+
+        function exitTest() {
+            clearInterval(currentSession.timerInterval);
+            currentSession.active = false;
+            switchTab('modules');
+        }
+
+        function finishTestSession() {
+            alert('Zeit abgelaufen! Ergebnisse wurden im Dashboard gespeichert.');
+            exitTest();
+        }
+
+        // --- AUFGABEN-GENERATOR (DLR REALISTIC) ---
+        function nextQuestion() {
+            const qBox = document.getElementById('q-box');
+            qBox.innerHTML = '';
+            currentSession.startTime = Date.now();
+
+            const level = userStats.modules[currentSession.moduleId].level;
+
+            switch(currentSession.moduleId) {
+                case 'krn': generateKRN(qBox, level); break;
+                case 'rag': generateRAG(qBox, level); break;
+                case 'wrt': generateWRT(qBox, level); break;
+                case 'owt': generateOWT(qBox, level); break;
+                case 'skt': generateSKT(qBox, level); break;
+                case 'ens': generateENS(qBox, level); break;
+                case 'tvt': generateTVT(qBox, level); break;
+            }
+        }
+
+        // 1. KRN (Kopfrechnen)
+        function generateKRN(box, level) {
+            let num1 = Math.floor(Math.random() * (15 * level)) + 5;
+            let num2 = Math.floor(Math.random() * (12 * level)) + 2;
+            let ops = ['+', '-', '*'];
+            let op = ops[Math.floor(Math.random() * (level > 1 ? 3 : 2))];
+            
+            let ans = eval(`${num1} ${op} ${num2}`);
+            currentSession.currentQuestion = { answer: ans.toString() };
+
+            box.innerHTML = `
+                <div class="question-text">${num1} ${op === '*' ? '×' : op} ${num2} = ?</div>
+                <div class="input-box">
+                    <input type="number" id="krn-input" class="text-input" autofocus autocomplete="off">
+                    <button class="btn btn-training" onclick="checkKRN()">OK</button>
+                </div>
+            `;
+            document.getElementById('krn-input').focus();
+            document.getElementById('krn-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') checkKRN(); });
+        }
+
+        function checkKRN() {
+            const val = document.getElementById('krn-input').value.trim();
+            handleAnswer(val === currentSession.currentQuestion.answer, currentSession.currentQuestion.answer);
+        }
+
+        // 2. RAG (Rechenaufgaben & Logik - Aviatik)
+        function generateRAG(box, level) {
+            const questions = [
+                {
+                    q: "Ein Flugzeug verbraucht 2.400 kg Treibstoff pro Stunde. Wie viel Treibstoff wird für einen Flug von 45 Minuten benötigt?",
+                    a: "1800 kg",
+                    opts: ["1600 kg", "1800 kg", "1950 kg", "2000 kg"]
+                },
+                {
+                    q: "Geschwindigkeit über Grund: 360 Knoten. Entfernung zum Wegpunkt: 90 NM. Wie lange dauert der Flugabschnitt?",
+                    a: "15 Minuten",
+                    opts: ["12 Minuten", "15 Minuten", "18 Minuten", "20 Minuten"]
+                },
+                {
+                    q: "Ein Sinken von FL300 auf FL100 soll mit 2.000 ft/min erfolgen. Wie viele Minuten dauert der Sinkflug?",
+                    a: "10 Minuten",
+                    opts: ["8 Minuten", "10 Minuten", "12 Minuten", "15 Minuten"]
+                }
+            ];
+            const q = questions[Math.floor(Math.random() * questions.length)];
+            currentSession.currentQuestion = { answer: q.a };
+
+            renderMultipleChoice(box, q.q, q.opts);
+        }
+
+        // 3. WRT (Würfelkipp-Test)
+        function generateWRT(box, level) {
+            const moves = ['VORN', 'HINTEN', 'LINKS', 'RECHTS'];
+            const count = 3 + level;
+            let sequence = [];
+            for(let i=0; i<count; i++) sequence.push(moves[Math.floor(Math.random()*4)]);
+
+            currentSession.currentQuestion = { answer: "Oben" }; // Vereinfachtes Trainingsbeispiel
+
+            box.innerHTML = `
+                <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Ausgangslage: Markierung ist OBEN.</div>
+                <div class="question-text">Folge den Kipp-Anweisungen:<br><strong style="color: var(--accent-yellow);">${sequence.join(' ➔ ')}</strong></div>
+                <div style="font-size: 0.9rem; margin-bottom: 1rem;">Wo befindet sich die Markierung am Ende?</div>
+            `;
+
+            renderMultipleChoice(box, "", ["Oben", "Unten", "Vorn", "Hinten", "Links", "Rechts"]);
+        }
+
+        // 4. OWT (Optischer Wahrnehmungs- & Merkfähigkeitstest)
+        function generateOWT(box, level) {
+            const count = 3 + level; // Dynamische Steigerung (3 -> 4 -> 5...)
+            const callsigns = ['LH401', 'EW702', 'AF123', 'KL982', 'DL441', 'UA900'];
+            let items = [];
+            for(let i=0; i<count; i++) items.push(callsigns[Math.floor(Math.random()*callsigns.length)]);
+
+            box.innerHTML = `
+                <div class="question-text">Merke dir folgende Callsigns (${count} Elemente):</div>
+                <div style="font-size: 2rem; font-weight: bold; color: var(--accent-blue); letter-spacing: 2px; margin: 1.5rem 0;">
+                    ${items.join('  -  ')}
+                </div>
+            `;
+
+            setTimeout(() => {
+                if(!currentSession.active) return;
+                const target = items[Math.floor(Math.random() * items.length)];
+                currentSession.currentQuestion = { answer: target };
+
+                let wrongOpts = callsigns.filter(c => !items.includes(c)).slice(0, 3);
+                let opts = [...wrongOpts, target].sort(() => Math.random() - 0.5);
+
+                box.innerHTML = `<div class="question-text">Welcher dieser Callsigns war in der Sequenz enthalten?</div>`;
+                renderMultipleChoice(box, "", opts);
+            }, 3000 + (level * 500)); // Anzeigedauer basierend auf Level
+        }
+
+        // 5. SKT (Signal- & Konzentrations-Reaktion)
+        function generateSKT(box, level) {
+            const isTarget = Math.random() > 0.4;
+            const color = isTarget ? 'var(--accent-green)' : 'var(--accent-red)';
+            const text = isTarget ? 'DRÜCKEN' : 'NICHT DRÜCKEN';
+            
+            currentSession.currentQuestion = { answer: isTarget ? 'click' : 'pass' };
+
+            box.innerHTML = `
+                <div class="question-text">Regel: Klicke NUR, wenn der Kreis GRÜN ist!</div>
+                <div class="skt-target" style="background-color: ${color}; color: #000;" id="skt-btn">
+                    ${text}
+                </div>
+            `;
+
+            let answered = false;
+            const timer = setTimeout(() => {
+                if(!answered && currentSession.active) {
+                    answered = true;
+                    handleAnswer(!isTarget, isTarget ? "Klick erforderlich" : "Kein Klick");
+                }
+            }, 1500);
+
+            document.getElementById('skt-btn').onclick = () => {
+                if(!answered) {
+                    answered = true;
+                    clearTimeout(timer);
+                    handleAnswer(isTarget, "Grünes Signal");
+                }
+            };
+        }
+
+        // 6. ENS (Aviation English)
+        function generateENS(box, level) {
+            const questions = [
+                {
+                    q: "ATC: 'Lufthansa 401, climb and maintain Flight Level 240.' What is required?",
+                    a: "Ascend to 24,000 feet",
+                    opts: ["Descend to 24,000 feet", "Ascend to 24,000 feet", "Turn right heading 240", "Maintain current altitude"]
+                },
+                {
+                    q: "What does the term 'Hold Short' mean in air traffic control instructions?",
+                    a: "Stop before entering a specific taxiway or runway",
+                    opts: ["Stop before entering a specific taxiway or runway", "Continue at low speed", "Hold altitude for 2 minutes", "Expedite takeoff immediately"]
+                }
+            ];
+            const q = questions[Math.floor(Math.random() * questions.length)];
+            currentSession.currentQuestion = { answer: q.a };
+
+            renderMultipleChoice(box, q.q, q.opts);
+        }
+
+        // 7. TVT (Technisches Verständnis)
+        function generateTVT(box, level) {
+            const questions = [
+                {
+                    q: "Zwei Zahnräder greifen ineinander. Zahnrad A hat 12 Zähne, Zahnrad B 24. Wenn sich Zahnrad A 4-mal dreht, wie oft dreht sich B?",
+                    a: "2-mal",
+                    opts: ["1-mal", "2-mal", "4-mal", "8-mal"]
+                },
+                {
+                    q: "Wie verändert sich der Luftdruck mit zunehmender Höhe in der Atmosphäre?",
+                    a: "Er nimmt ab",
+                    opts: ["Er nimmt zu", "Er nimmt ab", "Er bleibt konstant", "Er schwankt periodisch"]
+                }
+            ];
+            const q = questions[Math.floor(Math.random() * questions.length)];
+            currentSession.currentQuestion = { answer: q.a };
+
+            renderMultipleChoice(box, q.q, q.opts);
+        }
+
+        // --- HELPER RENDERING ---
+        function renderMultipleChoice(box, text, options) {
+            if(text) {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'question-text';
+                qDiv.innerText = text;
+                box.appendChild(qDiv);
+            }
+
+            const grid = document.createElement('div');
+            grid.className = 'options-grid';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => handleAnswer(opt === currentSession.currentQuestion.answer, currentSession.currentQuestion.answer);
+                grid.appendChild(btn);
+            });
+
+            box.appendChild(grid);
+        }
+
+        // --- ANTWORT-AUSWERTUNG & ADAPTIVES SYSTEM ---
+        function handleAnswer(isCorrect, correctAnswerText) {
+            const timeSpent = (Date.now() - currentSession.startTime) / 1000;
+            const mStats = userStats.modules[currentSession.moduleId];
+
+            // Statistische Updates
+            userStats.totalAnswered++;
+            mStats.total++;
+            mStats.totalTime += timeSpent;
+            userStats.totalTimeSpent += timeSpent;
+
+            if (isCorrect) {
+                userStats.totalCorrect++;
+                mStats.correct++;
+            }
+
+            // Adaptives Logik-System (Level Anpassung)
+            const acc = mStats.correct / mStats.total;
+            if (mStats.total >= 5) {
+                if (acc >= 0.8 && mStats.level < 5) mStats.level++;
+                else if (acc < 0.5 && mStats.level > 1) mStats.level--;
+            }
+
+            // Speichern in LocalStorage
+            localStorage.setItem('dlr_stats', JSON.stringify(userStats));
+
+            // Feedback anzeigen (Nur im Training-Modus)
+            if (currentSession.mode === 'training') {
+                showFeedback(isCorrect, correctAnswerText);
+            } else {
+                nextQuestion();
+            }
+        }
+
+        function showFeedback(isCorrect, correctAnswerText) {
+            const box = document.getElementById('q-box');
+            const overlay = document.createElement('div');
+            overlay.className = 'feedback-overlay';
+            overlay.innerHTML = `
+                <div class="feedback-title ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'}">
+                    ${isCorrect ? '✓ KORREKT' : '✗ FALSCH'}
+                </div>
+                <div style="margin-bottom: 1.5rem; color: var(--text-muted);">
+                    ${isCorrect ? 'Hervorragende Reaktionszeit!' : `Richtig wäre gewesen: <strong>${correctAnswerText}</strong>`}
+                </div>
+                <button class="btn btn-training" style="max-width: 200px;" onclick="nextQuestion()">Nächste Aufgabe</button>
+            `;
+            box.appendChild(overlay);
+        }
+
+        // --- VOLLSIMULATION MODUS ---
+        function startFullSimulation() {
+            currentSession.simQueue = Object.keys(MODULES);
+            currentSession.simIndex = 0;
+            alert("START DER DLR-TESTSIMULATION\n\n- Alle Module werden hintereinander geprüft.\n- Feste Zeitlimits pro Modul.\n- Kein direktes Feedback während der Tests.\n\nViel Erfolg!");
+            
+            startTest(currentSession.simQueue[0], 'sim');
+        }
+
+        // Initialisierung beim Laden
+        switchTab('dashboard');
+    </script>
+</body>
+</html>
