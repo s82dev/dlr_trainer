@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✈️ DLR Pilot Training - Testplattform</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #151c2c;
+            --card-border: #222f47;
+            --accent-blue: #00e5ff;
+            --accent-green: #00ff88;
+            --accent-yellow: #ffb700;
+            --accent-red: #ff3366;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #080b12;
+            border-bottom: 1px solid var(--card-border);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.4rem; font-weight: 700; color: var(--accent-blue);
+            display: flex; align-items: center; gap: 0.5rem; letter-spacing: 1px;
+        }
+
+        nav { display: flex; gap: 0.5rem; }
+
+        .nav-btn {
+            background: transparent; border: 1px solid var(--card-border);
+            color: var(--text-muted); padding: 0.5rem 1rem; border-radius: 6px;
+            cursor: pointer; font-weight: 600; transition: all 0.2s;
+        }
+
+        .nav-btn.active, .nav-btn:hover {
+            border-color: var(--accent-blue); color: var(--accent-blue); background: rgba(0, 229, 255, 0.05);
+        }
+
+        main { flex: 1; padding: 1.5rem; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+        .grid-dashboard {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 10px; padding: 1.25rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+        .card-value { font-size: 1.8rem; font-weight: 700; color: var(--text-main); }
+        .card-subtext { font-size: 0.8rem; color: var(--accent-blue); margin-top: 0.25rem; }
+
+        .section-title {
+            font-size: 1.2rem; margin-bottom: 1rem; color: var(--accent-blue);
+            border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem;
+        }
+
+        .grid-modules { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; }
+
+        .module-card {
+            background-color: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 10px; padding: 1.25rem; display: flex; flex-direction: column;
+            justify-content: space-between; transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .module-card:hover { transform: translateY(-2px); border-color: var(--accent-blue); }
+        .module-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-main); }
+        .module-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.4; min-height: 40px; }
+
+        .stats-mini {
+            display: flex; justify-content: space-between; background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.8rem; margin-bottom: 1rem;
+        }
+        .stats-mini span { color: var(--text-muted); }
+        .stats-mini strong { color: var(--accent-blue); }
+
+        .btn-group { display: flex; gap: 0.5rem; }
+        .btn {
+            flex: 1; padding: 0.6rem; border: none; border-radius: 6px; font-weight: 600;
+            font-size: 0.85rem; cursor: pointer; transition: opacity 0.2s; text-align: center;
+        }
+        .btn:hover { opacity: 0.85; }
+        .btn-training { background-color: var(--accent-green); color: #000; }
+        .btn-time { background-color: var(--accent-yellow); color: #000; }
+        .btn-sim { background-color: var(--accent-red); color: #fff; }
+
+        .workspace { display: none; flex-direction: column; gap: 1.5rem; }
+        .workspace.active { display: flex; }
+
+        .test-header {
+            display: flex; justify-content: space-between; align-items: center; background: var(--card-bg);
+            border: 1px solid var(--card-border); padding: 1rem 1.5rem; border-radius: 10px;
+        }
+
+        .timer-display {
+            font-size: 1.5rem; font-weight: 700; font-family: monospace; color: var(--accent-yellow);
+            background: #000; padding: 0.2rem 0.8rem; border-radius: 6px; border: 1px solid var(--accent-yellow);
+        }
+
+        .question-box {
+            background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px;
+            padding: 2rem; text-align: center; min-height: 300px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; position: relative; overflow: hidden;
+        }
+
+        .question-text { font-size: 1.4rem; margin-bottom: 1.5rem; line-height: 1.5; }
+
+        .options-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;
+            width: 100%; max-width: 700px;
+        }
+
+        .option-btn {
+            background: #1e293b; border: 1px solid var(--card-border); color: var(--text-main);
+            padding: 1rem; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.2s;
+        }
+        .option-btn:hover { border-color: var(--accent-blue); background: #283548; }
+
+        .input-box { display: flex; gap: 0.5rem; width: 100%; max-width: 400px; }
+        .text-input {
+            flex: 1; padding: 0.8rem; border-radius: 6px; border: 1px solid var(--card-border);
+            background: #0b0f19; color: #fff; font-size: 1.2rem; text-align: center;
+        }
+
+        .feedback-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.95); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; padding: 1.5rem; z-index: 10;
+        }
+        .feedback-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .feedback-correct { color: var(--accent-green); }
+        .feedback-incorrect { color: var(--accent-red); }
+
+        .skt-target {
+            width: 120px; height: 120px; border-radius: 50%; margin: 1rem auto; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5); transition: background-color 0.1s;
+        }
+
+        .cube-sequence {
+            display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-bottom: 1.5rem;
+        }
+        .cube-move {
+            background: #1e293b; padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid var(--accent-blue);
+            font-weight: bold; letter-spacing: 1px;
+        }
+
+        @media (max-width: 600px) {
+            header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+            .nav-btn { padding: 0.4rem 0.6rem; font-size: 0.8rem; }
+            .grid-modules { grid-template-columns: 1fr; }
+            .question-text { font-size: 1.1rem; }
+            .options-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">✈️ DLR PILOT TRAINING</div>
+        <nav>
+            <button class="nav-btn active" onclick="switchTab('dashboard')">Dashboard</button>
+            <button class="nav-btn" onclick="switchTab('modules')">Testmodule</button>
+            <button class="nav-btn" style="color: var(--accent-red); border-color: var(--accent-red);" onclick="startFullSimulation()">🔴 Vollsimulation</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- DASHBOARD TAB -->
+        <div id="tab-dashboard">
+            <h2 class="section-title">GESAMTPERFORMANCE</h2>
+            <div class="grid-dashboard">
+                <div class="card">
+                    <div class="card-header">Gesamtgenauigkeit</div>
+                    <div class="card-value" id="dash-accuracy">0%</div>
+                    <div class="card-subtext" id="dash-total-q">0 Aufgaben bearbeitet</div>
+                </div>
+                <div class="card">
+                    <div class="card-header">Durchschn. Zeit / Aufgabe</div>
+                    <div class="card-value" id="dash-speed">0.00s</div>
+                    <div class="card-subtext">Verarbeitungsgeschwindigkeit</div>
+                </div>
+                <div class="card">
+                    <div class="card-header">Trainings-Streak</div>
+                    <div class="card-value" id="dash-streak">0 Tage</div>
+                    <div class="card-subtext">Kontinuität ist entscheidend</div>
+                </div>
+            </div>
+
+            <h2 class="section-title">LEISTUNG NACH TESTBEREICHEN</h2>
+            <div class="grid-modules" id="dashboard-breakdown"></div>
+        </div>
+
+        <!-- MODULES TAB -->
+        <div id="tab-modules" style="display: none;">
+            <h2 class="section-title">DLR TESTMODULE (BU)</h2>
+            <div class="grid-modules" id="modules-list"></div>
+        </div>
+
+        <!-- WORKSPACE / TEST AREA -->
+        <div id="workspace" class="workspace">
+            <div class="test-header">
+                <div>
+                    <h3 id="test-module-name" style="color: var(--accent-blue);">Modul Name</h3>
+                    <div id="test-mode-label" style="font-size: 0.8rem; color: var(--text-muted);">Training Modus</div>
+                </div>
+                <div style="display: flex; gap: 1.5rem; align-items: center;">
+                    <div style="text-align: right;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">ADAPTIVES LEVEL</div>
+                        <div id="adaptive-level" style="font-weight: bold; color: var(--accent-green);">Level 1</div>
+                    </div>
+                    <div class="timer-display" id="timer">00:00</div>
+                    <button class="nav-btn" onclick="exitTest()" style="border-color: var(--accent-red); color: var(--accent-red);">Abbrechen</button>
+                </div>
+            </div>
+
+            <div class="question-box" id="q-box">
+                <!-- Dynamischer Inhalt -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- KONFIGURATION & DATENBANK ---
+        const MODULES = {
+            krn: { name: "KRN - Kopfrechnen", desc: "Mentale Arithmetik ohne Hilfsmittel unter hohem Zeitdruck." },
+            rag: { name: "RAG - Rechenaufgaben", desc: "Physikalisch-mathematische Textaufgaben (Dreisatz, v=s/t, Prozent)." },
+            wrt: { name: "WRT - Würfelkipp-Test", desc: "Mentale Rotation eines Würfels anhand sequenzieller Anweisungen." },
+            owt: { name: "OWT - Wahrnehmung & Memory", desc: "Kurzzeit-Gedächtnis für Aviation-Codes (Callsigns, Frequenzen)." },
+            skt: { name: "SKT - Signal-Reaktion", desc: "Reaktionsgeschwindigkeit und Fehlererkennung auf visuelle Reize." },
+            ens: { name: "ENS - Aviation English", desc: "Verständnis englischer ATC-Anweisungen und Phrasologie." },
+            tvt: { name: "TVT - Technisches Verständnis", desc: "Grundlegende Physik, Mechanik, Hebel und Druckverhältnisse." }
+        };
+
+        const STATE = {
+            active: false,
+            moduleId: null,
+            mode: 'training', // 'training', 'time', 'sim'
+            timerInterval: null,
+            timeouts: [],
+            timeLeft: 0,
+            currentQuestion: null,
+            startTime: 0,
+            simQueue: [],
+            simIndex: 0
+        };
+
+        let userStats = JSON.parse(localStorage.getItem('dlr_stats')) || {
+            totalAnswered: 0, totalCorrect: 0, totalTimeSpent: 0, streak: 1,
+            modules: Object.keys(MODULES).reduce((acc, key) => {
+                acc[key] = { correct: 0, total: 0, totalTime: 0, level: 1 };
+                return acc;
+            }, {})
+        };
+
+        // --- HELPER FUNKTIONEN ---
+        function shuffleArray(arr) {
+            const array = [...arr];
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function calculateMath(a, b, op) {
+            switch(op) {
+                case '+': return a + b;
+                case '-': return a - b;
+                case '*': return a * b;
+                case '/': return parseFloat((a / b).toFixed(2));
+                default: return 0;
+            }
+        }
+
+        function registerTimeout(fn, delay) {
+            const id = setTimeout(fn, delay);
+            STATE.timeouts.push(id);
+            return id;
+        }
+
+        function clearAllTimeouts() {
+            STATE.timeouts.forEach(clearTimeout);
+            STATE.timeouts = [];
+        }
+
+        function saveStats() {
+            localStorage.setItem('dlr_stats', JSON.stringify(userStats));
+        }
+
+        // --- UI NAVIGATION ---
+        function switchTab(tabId) {
+            document.getElementById('tab-dashboard').style.display = tabId === 'dashboard' ? 'block' : 'none';
+            document.getElementById('tab-modules').style.display = tabId === 'modules' ? 'block' : 'none';
+            document.getElementById('workspace').classList.remove('active');
+            
+            document.querySelectorAll('header nav .nav-btn').forEach(btn => btn.classList.remove('active'));
+            if(tabId === 'dashboard') document.querySelectorAll('header nav .nav-btn')[0].classList.add('active');
+            if(tabId === 'modules') document.querySelectorAll('header nav .nav-btn')[1].classList.add('active');
+
+            if(tabId === 'dashboard') renderDashboard();
+            if(tabId === 'modules') renderModules();
+        }
+
+        function renderDashboard() {
+            const acc = userStats.totalAnswered > 0 ? Math.round((userStats.totalCorrect / userStats.totalAnswered) * 100) : 0;
+            const avgSpeed = userStats.totalAnswered > 0 ? (userStats.totalTimeSpent / userStats.totalAnswered).toFixed(2) : "0.00";
+
+            document.getElementById('dash-accuracy').innerText = `${acc}%`;
+            document.getElementById('dash-total-q').innerText = `${userStats.totalAnswered} Aufg.`;
+            document.getElementById('dash-speed').innerText = `${avgSpeed}s`;
+            document.getElementById('dash-streak').innerText = `${userStats.streak} Tage`;
+
+            const container = document.getElementById('dashboard-breakdown');
+            container.innerHTML = '';
+
+            for (let id in MODULES) {
+                const m = userStats.modules[id];
+                const mAcc = m.total > 0 ? Math.round((m.correct / m.total) * 100) : 0;
+                const mSpeed = m.total > 0 ? (m.totalTime / m.total).toFixed(2) : "0.00";
+
+                container.innerHTML += `
+                    <div class="card">
+                        <div class="card-header">${MODULES[id].name}</div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                            <div><span style="font-size: 0.8rem; color: var(--text-muted);">Genauigkeit:</span> <strong style="color: var(--accent-green);">${mAcc}%</strong></div>
+                            <div><span style="font-size: 0.8rem; color: var(--text-muted);">Zeit/Aufg:</span> <strong style="color: var(--accent-blue);">${mSpeed}s</strong></div>
+                        </div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Adaptives Level: ${m.level} / 5</div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderModules() {
+            const container = document.getElementById('modules-list');
+            container.innerHTML = '';
+
+            for (let id in MODULES) {
+                const m = MODULES[id];
+                const stats = userStats.modules[id];
+                const acc = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+
+                container.innerHTML += `
+                    <div class="module-card">
+                        <div>
+                            <div class="module-title">${m.name}</div>
+                            <div class="module-desc">${m.desc}</div>
+                        </div>
+                        <div>
+                            <div class="stats-mini">
+                                <span>Genauigkeit: <strong>${acc}%</strong></span>
+                                <span>Level: <strong>${stats.level}</strong></span>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-training" onclick="startTest('${id}', 'training')">Training</button>
+                                <button class="btn btn-time" onclick="startTest('${id}', 'time')">Zeittraining</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // --- TEST ENGINE CORE ---
+        function startTest(moduleId, mode) {
+            clearAllTimeouts();
+            clearInterval(STATE.timerInterval);
+
+            STATE.active = true;
+            STATE.moduleId = moduleId;
+            STATE.mode = mode;
+            
+            document.getElementById('tab-dashboard').style.display = 'none';
+            document.getElementById('tab-modules').style.display = 'none';
+            document.getElementById('workspace').classList.add('active');
+
+            const modName = mode === 'sim' ? `SIMULATION: ${MODULES[moduleId].name}` : MODULES[moduleId].name;
+            document.getElementById('test-module-name').innerText = modName;
+            document.getElementById('test-mode-label').innerText = mode === 'training' ? '🟢 Training (Feedback)' : mode === 'time' ? '🟡 Zeittraining' : '🔴 DLR Simulation';
+            document.getElementById('adaptive-level').innerText = `Level ${userStats.modules[moduleId].level}`;
+
+            if (mode === 'time') {
+                STATE.timeLeft = 60; // 60s per individual time test
+                startTimer();
+            } else if (mode === 'sim') {
+                STATE.timeLeft = 45; // 45s per module in simulation
+                startTimer();
+            } else {
+                document.getElementById('timer').innerText = "∞";
+            }
+
+            nextQuestion();
+        }
+
+        function startFullSimulation() {
+            STATE.simQueue = Object.keys(MODULES);
+            STATE.simIndex = 0;
+            alert("START DER VOLLSIMULATION\n\n- Alle 7 DLR-Module hintereinander.\n- 45 Sekunden pro Modul.\n- Kein Feedback zwischen den Aufgaben.\n- Automatisch nächstes Modul bei Zeitablauf.");
+            startTest(STATE.simQueue[STATE.simIndex], 'sim');
+        }
+
+        function advanceSimulation() {
+            STATE.simIndex++;
+            if (STATE.simIndex < STATE.simQueue.length) {
+                startTest(STATE.simQueue[STATE.simIndex], 'sim');
+            } else {
+                alert("SIMULATION ABGESCHLOSSEN!\nAlle Daten wurden im Dashboard gespeichert.");
+                exitTest();
+            }
+        }
+
+        function startTimer() {
+            updateTimerDisplay();
+            STATE.timerInterval = setInterval(() => {
+                STATE.timeLeft--;
+                updateTimerDisplay();
+                if (STATE.timeLeft <= 0) {
+                    clearInterval(STATE.timerInterval);
+                    if (STATE.mode === 'sim') advanceSimulation();
+                    else {
+                        alert("Zeit abgelaufen!");
+                        exitTest();
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(STATE.timeLeft / 60).toString().padStart(2, '0');
+            const s = (STATE.timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer').innerText = `${m}:${s}`;
+        }
+
+        function exitTest() {
+            STATE.active = false;
+            clearAllTimeouts();
+            clearInterval(STATE.timerInterval);
+            switchTab('dashboard');
+        }
+
+        // --- MODUL GENERATOREN ---
+        function nextQuestion() {
+            if(!STATE.active) return;
+            const qBox = document.getElementById('q-box');
+            qBox.innerHTML = '';
+            STATE.startTime = Date.now();
+            const level = userStats.modules[STATE.moduleId].level;
+
+            switch(STATE.moduleId) {
+                case 'krn': generateKRN(qBox, level); break;
+                case 'rag': generateRAG(qBox, level); break;
+                case 'wrt': generateWRT(qBox, level); break;
+                case 'owt': generateOWT(qBox, level); break;
+                case 'skt': generateSKT(qBox, level); break;
+                case 'ens': generateENS(qBox, level); break;
+                case 'tvt': generateTVT(qBox, level); break;
+            }
+        }
+
+        function renderMultipleChoice(box, text, optionsArr, correctAns) {
+            STATE.currentQuestion = { answer: correctAns };
+            if(text) box.innerHTML += `<div class="question-text">${text}</div>`;
+            
+            const grid = document.createElement('div');
+            grid.className = 'options-grid';
+            
+            const shuffled = shuffleArray(optionsArr);
+            shuffled.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => handleAnswer(opt === correctAns, correctAns);
+                grid.appendChild(btn);
+            });
+            box.appendChild(grid);
+        }
+
+        // 1. KRN
+        function generateKRN(box, level) {
+            let num1 = Math.floor(Math.random() * (15 * level)) + 5;
+            let num2 = Math.floor(Math.random() * (10 * level)) + 2;
+            let ops = ['+', '-', '*'];
+            let op = ops[Math.floor(Math.random() * (level > 2 ? 3 : 2))];
+            
+            // Verhindere zu oft negative Zahlen bei einfacheren Leveln
+            if(op === '-' && num1 < num2 && level < 3) [num1, num2] = [num2, num1];
+
+            let ans = calculateMath(num1, num2, op);
+            STATE.currentQuestion = { answer: ans.toString() };
+
+            box.innerHTML = `
+                <div class="question-text">${num1} ${op === '*' ? '×' : op} ${num2} = ?</div>
+                <div class="input-box">
+                    <input type="number" id="krn-input" class="text-input" autocomplete="off">
+                    <button class="btn btn-training" onclick="checkKRN()">OK</button>
+                </div>
+            `;
+            const input = document.getElementById('krn-input');
+            // Auto-focus logic that doesn't break mobile keyboards immediately
+            setTimeout(() => input.focus(), 50);
+            input.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkKRN(); });
+        }
+
+        function checkKRN() {
+            const val = document.getElementById('krn-input').value.trim();
+            if(val === "") return;
+            handleAnswer(val === STATE.currentQuestion.answer, STATE.currentQuestion.answer);
+        }
+
+        // 2. RAG
+        function generateRAG(box, level) {
+            const db = [
+                { q: "Ein Flugzeug verbraucht 2400 kg Treibstoff pro Stunde. Wie viel kg werden für 45 Minuten benötigt?", a: "1800 kg", w: ["1600 kg", "1950 kg", "2000 kg", "2100 kg"] },
+                { q: "Geschwindigkeit: 360 Knoten. Entfernung: 90 NM. Wie lange dauert der Flugabschnitt?", a: "15 Min", w: ["12 Min", "18 Min", "20 Min", "25 Min"] },
+                { q: "Sinken von FL300 auf FL100 mit 2000 ft/min. Wie viele Minuten dauert der Sinkflug?", a: "10 Min", w: ["8 Min", "12 Min", "15 Min", "20 Min"] },
+                { q: "Wenn 4 Pumpen einen Tank in 6 Stunden füllen, wie lange brauchen 3 Pumpen?", a: "8 Stunden", w: ["4.5 Stunden", "7 Stunden", "9 Stunden", "10 Stunden"] }
+            ];
+            const q = db[Math.floor(Math.random() * db.length)];
+            const opts = [q.a, ...q.w].slice(0, 4); // Take correct + 3 wrong
+            renderMultipleChoice(box, q.q, opts, q.a);
+        }
+
+        // 3. WRT (Echte 3D Logik)
+        function generateWRT(box, level) {
+            const count = 2 + level; 
+            const movesAvailable = ['VORN', 'HINTEN', 'LINKS', 'RECHTS'];
+            let sequence = [];
+            for(let i=0; i<count; i++) sequence.push(movesAvailable[Math.floor(Math.random()*4)]);
+
+            // 0:Top, 1:Bottom, 2:Front, 3:Back, 4:Left, 5:Right
+            const faceNames = ["Oben", "Unten", "Vorn", "Hinten", "Links", "Rechts"];
+            let markerPos = 0; // Start at Top
+
+            // Berechne echte Endposition
+            sequence.forEach(move => {
+                let p = markerPos;
+                if (move === 'VORN') {
+                    if(p===0) markerPos=2; else if(p===2) markerPos=1; else if(p===1) markerPos=3; else if(p===3) markerPos=0;
+                } else if (move === 'HINTEN') {
+                    if(p===0) markerPos=3; else if(p===3) markerPos=1; else if(p===1) markerPos=2; else if(p===2) markerPos=0;
+                } else if (move === 'LINKS') {
+                    if(p===0) markerPos=4; else if(p===4) markerPos=1; else if(p===1) markerPos=5; else if(p===5) markerPos=0;
+                } else if (move === 'RECHTS') {
+                    if(p===0) markerPos=5; else if(p===5) markerPos=1; else if(p===1) markerPos=4; else if(p===4) markerPos=0;
+                }
+            });
+
+            const correctAns = faceNames[markerPos];
+            
+            let html = `
+                <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">Ausgangslage: Markierung ist OBEN.</div>
+                <div class="cube-sequence">
+                    ${sequence.map(m => `<div class="cube-move">${m}</div>`).join('')}
+                </div>
+                <div style="font-size: 1.1rem; margin-bottom: 1.5rem;">Wo befindet sich die Markierung am Ende?</div>
+            `;
+            box.innerHTML = html;
+            renderMultipleChoice(box, "", faceNames, correctAns);
+        }
+
+        // 4. OWT
+        function generateOWT(box, level) {
+            const count = 3 + Math.floor(level/2);
+            const pool = ['LH401', 'EW702', 'AF123', 'KL982', 'DL441', 'UA900', 'BA221', 'LX330', 'FL330', 'HDG180', '118.5'];
+            const shuffledPool = shuffleArray(pool);
+            const sequence = shuffledPool.slice(0, count);
+            const target = sequence[Math.floor(Math.random() * sequence.length)];
+            
+            box.innerHTML = `
+                <div class="question-text">Merke dir folgende Informationen:</div>
+                <div style="font-size: 2rem; font-weight: bold; color: var(--accent-blue); letter-spacing: 2px; margin: 1.5rem 0;">
+                    ${sequence.join(' &nbsp; ')}
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Verschwindet in wenigen Sekunden...</div>
+            `;
+
+            registerTimeout(() => {
+                if(!STATE.active) return;
+                box.innerHTML = '';
+                let wrongOpts = shuffledPool.filter(c => !sequence.includes(c)).slice(0, 3);
+                let opts = [...wrongOpts, target];
+                renderMultipleChoice(box, "Welcher Code war in der Sequenz enthalten?", opts, target);
+            }, Math.max(2000, 4000 - (level * 300))); // Kürzer bei hohem Level
+        }
+
+        // 5. SKT (Echte Reaktionslogik)
+        function generateSKT(box, level) {
+            const isTarget = Math.random() > 0.3; // 70% chance for green
+            
+            box.innerHTML = `
+                <div class="question-text">Klicke NUR auf den Kreis, wenn er <strong style="color:var(--accent-green)">GRÜN</strong> wird!</div>
+                <div class="skt-target" style="background-color: #334155; color: #94a3b8;" id="skt-btn">WARTE</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem;">Nicht bei Rot klicken! Zu frühes Klicken ist ein Fehler.</div>
+            `;
+
+            let state = "WAIT"; // WAIT -> SIGNAL
+            const btn = document.getElementById('skt-btn');
+            
+            btn.onmousedown = () => {
+                if(state === "WAIT") {
+                    handleAnswer(false, "Zu früh geklickt (False Start)!");
+                } else if(state === "SIGNAL") {
+                    if(isTarget) handleAnswer(true, "Grünes Signal");
+                    else handleAnswer(false, "Falsche Reaktion (Klick bei Rot)!");
+                }
+            };
+
+            const delay = Math.floor(Math.random() * 2000) + 1000; // 1-3s Wait
+            
+            registerTimeout(() => {
+                state = "SIGNAL";
+                btn.style.backgroundColor = isTarget ? "var(--accent-green)" : "var(--accent-red)";
+                btn.style.color = "#000";
+                btn.innerText = isTarget ? "KLICK!" : "STOP!";
+                STATE.startTime = Date.now(); // Reset time for accurate MS measurement
+
+                // Auto-resolve nach 1.5s
+                registerTimeout(() => {
+                    if(STATE.active) {
+                        if(isTarget) handleAnswer(false, "Zu langsam! Du hättest klicken müssen.");
+                        else handleAnswer(true, "Korrekt ignoriert.");
+                    }
+                }, 1500 - (level * 100)); // Wird bei hohem Level schneller
+
+            }, delay);
+        }
+
+        // 6. ENS
+        function generateENS(box, level) {
+            const db = [
+                { q: "'Lufthansa 401, climb and maintain Flight Level 240.' What is required?", a: "Ascend to 24,000 feet", w: ["Descend to 24,000 feet", "Turn heading 240", "Maintain current altitude"] },
+                { q: "What does 'Hold Short' mean?", a: "Stop before a specific line/runway", w: ["Continue at low speed", "Hold altitude for 2 min", "Expedite takeoff immediately"] },
+                { q: "'Cleared for ILS approach runway 27R'. What is the aircraft cleared to do?", a: "Execute the landing approach for 27 Right", w: ["Taxi to runway 27R", "Take off from runway 27R", "Hold over the airport"] },
+                { q: "What does 'Squawk 7700' mean?", a: "General Emergency", w: ["Radio Failure", "Hijacking", "Normal Operations"] }
+            ];
+            const q = db[Math.floor(Math.random() * db.length)];
+            const opts = [q.a, ...q.w];
+            renderMultipleChoice(box, q.q, opts, q.a);
+        }
+
+        // 7. TVT
+        function generateTVT(box, level) {
+            const db = [
+                { q: "Zahnrad A (12 Zähne) treibt Zahnrad B (24 Zähne). A dreht sich 4-mal. Wie oft dreht sich B?", a: "2-mal", w: ["1-mal", "4-mal", "8-mal"] },
+                { q: "Wie verändert sich der statische Luftdruck mit zunehmender Höhe?", a: "Er nimmt ab", w: ["Er nimmt zu", "Er bleibt konstant", "Er schwankt periodisch"] },
+                { q: "Was passiert mit der Temperatur eines Gases, wenn es komprimiert wird (Volumen verkleinert)?", a: "Temperatur steigt", w: ["Temperatur sinkt", "Bleibt gleich", "Gas kondensiert sofort"] },
+                { q: "Bernoulli-Effekt an einer Tragfläche: Wo die Luft schneller strömt, ist der Druck...", a: "...niedriger.", w: ["...höher.", "...gleich.", "...unabhängig von der Geschwindigkeit."] }
+            ];
+            const q = db[Math.floor(Math.random() * db.length)];
+            const opts = [q.a, ...q.w];
+            renderMultipleChoice(box, q.q, opts, q.a);
+        }
+
+        // --- AUSWERTUNG & ADAPTIVES LEVELING ---
+        function handleAnswer(isCorrect, correctAnsText) {
+            clearAllTimeouts(); // Stop any pending SKT/OWT logic
+            
+            const timeSpent = (Date.now() - STATE.startTime) / 1000;
+            const mod = userStats.modules[STATE.moduleId];
+
+            userStats.totalAnswered++;
+            userStats.totalTimeSpent += timeSpent;
+            mod.total++;
+            mod.totalTime += timeSpent;
+
+            if (isCorrect) {
+                userStats.totalCorrect++;
+                mod.correct++;
+            }
+
+            // Adaptives Leveling (jeden 5. Versuch prüfen)
+            if (mod.total % 5 === 0) {
+                const acc = mod.correct / mod.total;
+                if (acc >= 0.8 && mod.level < 5) mod.level++;
+                else if (acc <= 0.4 && mod.level > 1) mod.level--;
+            }
+
+            saveStats();
+
+            if (STATE.mode === 'training') {
+                showFeedback(isCorrect, correctAnsText, timeSpent);
+            } else {
+                nextQuestion(); // Im Zeit/Sim-Modus direkt weiter
+            }
+        }
+
+        function showFeedback(isCorrect, text, time) {
+            const box = document.getElementById('q-box');
+            const overlay = document.createElement('div');
+            overlay.className = 'feedback-overlay';
+            
+            let timeStr = STATE.moduleId === 'skt' ? `${(time*1000).toFixed(0)} ms` : `${time.toFixed(1)} s`;
+
+            overlay.innerHTML = `
+                <div class="feedback-title ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'}">
+                    ${isCorrect ? '✓ KORREKT' : '✗ FALSCH'}
+                </div>
+                <div style="color: var(--text-muted); margin-bottom: 0.5rem;">Zeit: ${timeStr}</div>
+                <div style="margin-bottom: 2rem; font-size: 1.1rem;">
+                    ${isCorrect ? 'Gute Arbeit!' : `Richtig: <strong style="color: #fff;">${text}</strong>`}
+                </div>
+                <button class="btn btn-training" style="max-width: 200px; padding: 1rem;" onclick="nextQuestion()">Weiter</button>
+            `;
+            box.appendChild(overlay);
+            
+            // Allow Enter to continue
+            setTimeout(() => {
+                const btn = overlay.querySelector('button');
+                btn.focus();
+            }, 50);
+        }
+
+        // INIT
+        switchTab('dashboard');
+
+    </script>
+</body>
+</html>
